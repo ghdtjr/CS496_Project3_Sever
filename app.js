@@ -8,9 +8,11 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-/** define models
- * will be implemented..
- */
+/* define models */
+var Recipe = require('./models/recipe');
+var Ingredients = require('./models/ingredients');
+var Img = require('./models/img');
+
 
 /* Create express service */
 var app = express();
@@ -18,6 +20,7 @@ var app = express();
 /* To extract the parameter from the POST request data's body */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
@@ -28,7 +31,7 @@ var MongoClient = mongodb.MongoClient;
 var mongo_url = 'mongodb://localhost:27017/project3';
 
 /* Confure router model */
-var router = require('./routes')(app)
+var router = require('./routes')(app, Recipe, Ingredients, Img)
 
 /* Create WEB SERVER*/
 var server = app.listen(PORT, function () {
