@@ -93,7 +93,7 @@ module.exports = function (app, Recipe_Text, Recipe_Img, Recipe_Timer, Ingredien
     });
 
     /**Show main recipe_img for the given recipe_name
-     * response will be the Array of String url  */
+     * response will be the Array of String file_name  */
     app.get('/main/recipe_img/:recipe_name', function (request, response) {
         console.log('/main/recipe_img/:recipe_name');
         var recipe_name = request.params.recipe_name;
@@ -123,13 +123,36 @@ module.exports = function (app, Recipe_Text, Recipe_Img, Recipe_Timer, Ingredien
             if (!recipe_timer) {
                 return response.status(404).json({ error: 'user not found' });
             }
-            response.json(recipe_timer.timer_steps.split(","));
+            response.json(recipe_timer.timer_steps.split("@"));
         });
         return;
     });
 
+    /**Show the image from the given url */
+    app.get('/main/step_img/:file_name', function (request, response) {
+        console.log('/main/step_img/:file_name');
 
+        var file_name = request.params.file_name;
+        console.log(file_name);
 
+        const dir_path = path.join(__dirname, "../recipe_images/");
+        const file_path = path.join(dir_path, file_name);
+        console.log(file_path);
+        try {
+            fs.access(file_path, fs.constants.F_OK, (err) => {
+                if (err) {
+                    console.error(err);
+                    return response.status(404).json({ msg: "Not Found", error: true });
+                } else {
+                    return response.status(200).sendFile(file_path);
+                }
+            });
+
+        } catch (error) {
+            console.error(error);
+            return response.status(500).json({ msg: "Internal Error", error: true });
+        }
+    });
 
 
 
