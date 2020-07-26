@@ -19,7 +19,7 @@ const upload_img = multer({
 });
 
 
-module.exports = function (app, Recipe, Ingredients, Img) {
+module.exports = function (app, Recipe_Text, Recipe_Img, Recipe_Timer, Ingredients, Img) {
 
     /**Show the ingridents for the given recipe_name
      * response will be Array of String */
@@ -34,13 +34,13 @@ module.exports = function (app, Recipe, Ingredients, Img) {
             if (!ingredients) {
                 return response.status(404).json({ error: 'user not found' });
             }
-            response.json(ingredients.ingredients);
+            response.json(ingredients.ingredients.split("@"));
         });
         return;
     });
 
     /**Show the food image for the given recipe_name
-     * response will be Array of json object {text, img_path, time} */
+     * response will be the img itself not img_path */
     app.get('/main/image/:recipe_name', function (request, response) {
         console.log('/main/image/:recipe_name');
 
@@ -74,16 +74,59 @@ module.exports = function (app, Recipe, Ingredients, Img) {
         });
     });
 
-    /**Show main recipe for the given recipe_name
-     * response will be the img itself not img_path */
-    app.get('/main/recipe/:recipe_name', function (request, response) {
-        console.log('/main/recipe/:recipe_name');
+    /**Show main recipe_text for the given recipe_name
+     * response will be the Array of String  */
+    app.get('/main/recipe_text/:recipe_name', function (request, response) {
+        console.log('/main/recipe_text/:recipe_name');
         var recipe_name = request.params.recipe_name;
-        response.end("nothing yet");
+
+        Recipe_Text.findOne({ name: recipe_name }, function (err, recipe_text) {
+            if (err) {
+                return response.status(500).send({ error: 'database failure' });
+            }
+            if (!recipe_text) {
+                return response.status(404).json({ error: 'user not found' });
+            }
+            response.json(recipe_text.text_steps.split("@"));
+        });
+        return;
     });
 
+    /**Show main recipe_img for the given recipe_name
+     * response will be the Array of String url  */
+    app.get('/main/recipe_img/:recipe_name', function (request, response) {
+        console.log('/main/recipe_img/:recipe_name');
+        var recipe_name = request.params.recipe_name;
 
+        Recipe_Img.findOne({ name: recipe_name }, function (err, recipe_img) {
+            if (err) {
+                return response.status(500).send({ error: 'database failure' });
+            }
+            if (!recipe_img) {
+                return response.status(404).json({ error: 'user not found' });
+            }
+            response.json(recipe_img.img_steps.split("@"));
+        });
+        return;
+    });
 
+    /**Show main recipe_timer for the given recipe_name
+     * response will be the Array of String  */
+    app.get('/main/recipe_timer/:recipe_name', function (request, response) {
+        console.log('/main/recipe_timer/:recipe_name');
+        var recipe_name = request.params.recipe_name;
+
+        Recipe_Timer.findOne({ name: recipe_name }, function (err, recipe_timer) {
+            if (err) {
+                return response.status(500).send({ error: 'database failure' });
+            }
+            if (!recipe_timer) {
+                return response.status(404).json({ error: 'user not found' });
+            }
+            response.json(recipe_timer.timer_steps.split(","));
+        });
+        return;
+    });
 
 
 
@@ -151,5 +194,57 @@ module.exports = function (app, Recipe, Ingredients, Img) {
         });
     });
 
-    app.post('/main/recipe',)
+    app.post('/main/recipe_text', function (request, response) {
+        console.log(request.body.name);
+        console.log(request.body.recipe_text);
+        Recipe_Text.countDocuments({ name: request.body.name }, function (err, cnt) {
+            if (cnt) {
+                response.json('Recipe for the ' + request.body.name + ' already exist');
+                console.log('Recipe for the ' + request.body.name + ' already exist');
+                return;
+            } else {
+                /* Get request's string */
+                var recipe_text = new Recipe_Text();
+                var post_data = request.body;
+                recipe_text.name = post_data.name;
+                recipe_text.text_steps = post_data.recipe_text;
+
+                recipe_text.save(function (err) {
+                    if (err) {
+                        console.err(err);
+                        response.json("0");
+                        return;
+                    }
+                    response.json("1");
+                });
+            }
+        });
+    });
+
+    app.post('/main/recipe_timer', function (request, response) {
+        console.log(request.body.name);
+        console.log(request.body.recipe_timer);
+        Recipe_Timer.countDocuments({ name: request.body.name }, function (err, cnt) {
+            if (cnt) {
+                response.json('Recipe for the ' + request.body.name + ' already exist');
+                console.log('Recipe for the ' + request.body.name + ' already exist');
+                return;
+            } else {
+                /* Get request's string */
+                var recipe_timer = new Recipe_Timer();
+                var post_data = request.body;
+                recipe_timer.name = post_data.name;
+                recipe_timer.timer_steps = post_data.recipe_timer;
+
+                recipe_timer.save(function (err) {
+                    if (err) {
+                        console.err(err);
+                        response.json("0");
+                        return;
+                    }
+                    response.json("1");
+                });
+            }
+        });
+    });
 }

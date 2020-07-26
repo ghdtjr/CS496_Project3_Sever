@@ -6,7 +6,10 @@ var recipe_timerSchema = new Schema({
         type: String,
         default: ''
     },
-    timer_steps: { type: Array }
+    timer_steps: {
+        type: String,
+        default: ''
+    }
 });
 
 module.exports = mongoose.model('recipe_timer', recipe_timerSchema);

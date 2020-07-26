@@ -6,7 +6,10 @@ var ingredientsSchema = new Schema({
         type: String,
         default: ''
     },
-    ingredients: { type: Array }
+    ingredients: {
+        type: String,
+        default: ''
+    }
 });
 
 module.exports = mongoose.model('ingredients', ingredientsSchema);

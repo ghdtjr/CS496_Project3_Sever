@@ -6,7 +6,10 @@ var recipe_textSchema = new Schema({
         type: String,
         default: ''
     },
-    text_steps: { type: Array }
+    text_steps: {
+        type: String,
+        default: ''
+    }
 });
 
 module.exports = mongoose.model('recipe_text', recipe_textSchema);

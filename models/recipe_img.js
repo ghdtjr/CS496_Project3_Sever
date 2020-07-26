@@ -6,7 +6,10 @@ var recipe_imgSchema = new Schema({
         type: String,
         default: ''
     },
-    img_steps: { type: Array }
+    img_steps: {
+        type: String,
+        default: ''
+    }
 });
 
 module.exports = mongoose.model('recipe_img', recipe_imgSchema);
