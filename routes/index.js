@@ -97,9 +97,9 @@ module.exports = function (app, Recipe_Text, Recipe_Img, Recipe_Timer, Ingredien
     app.get('/main/recipe_img/:recipe_name', function (request, response) {
         console.log('/main/recipe_img/:recipe_name');
         var recipe_name = request.params.recipe_name;
-
         Recipe_Img.findOne({ name: recipe_name }, function (err, recipe_img) {
             if (err) {
+                console.log(recipe_name);
                 return response.status(500).send({ error: 'database failure' });
             }
             if (!recipe_img) {
@@ -153,13 +153,6 @@ module.exports = function (app, Recipe_Text, Recipe_Img, Recipe_Timer, Ingredien
             return response.status(500).json({ msg: "Internal Error", error: true });
         }
     });
-
-
-
-
-
-
-
 
     /* Save the ingredients to the dababase*/
     app.post('/main/ingredients', function (request, response) {

@@ -7,6 +7,7 @@ var mongodb = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var cors = require('cors');
 
 /* define models */
 var Recipe_Text = require('./models/recipe_text.js');
@@ -21,6 +22,16 @@ var app = express();
 /* To extract the parameter from the POST request data's body */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: true, parameterLimit: 1000000 }));
+
+//cors
+app.use(cors({
+    origin: 'http://localhost:3000',
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+    // maxAge: 5,
+    // credentials: true,
+    allowMethods: ['GET', 'POST', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'application/json', 'X-Requested-With', 'Origin'],
+}));
 
 /* for render html file */
 // app.set('views', __dirname + '/views');
