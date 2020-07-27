@@ -21,6 +21,25 @@ const upload_img = multer({
 
 module.exports = function (app, Recipe_Text, Recipe_Img, Recipe_Timer, Ingredients, Img) {
 
+    app.get('/main/get_recipes', function (request, response) {
+        console.log('/main/get_recipes');
+
+        /* It will contain all the recipes as a string */
+        var recipe_names = '';
+        var names_list;
+        Img.find(function (err, recipes) {
+            if (err) {
+                return res.status(500).send({ error: 'database failure' });
+            }
+            recipes.forEach(recipe =>
+                recipe_names = recipe_names + recipe.name + "@"
+            );
+            names_list = recipe_names.split('@');
+            names_list.pop();
+            response.json(names_list);
+        });
+    });
+
     /**Show the ingridents for the given recipe_name
      * response will be Array of String */
     app.get('/main/ingredients/:recipe_name', function (request, response) {
