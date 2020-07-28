@@ -16,6 +16,7 @@ var Recipe_Timer = require("./models/recipe_timer.js");
 var Ingredients = require("./models/ingredients");
 var Img = require("./models/img");
 var Food_Info = require("./models/food_info");
+var User = require("./models/user");
 
 /* Create express service */
 var app = express();
@@ -66,7 +67,8 @@ var router = require("./routes")(
   Recipe_Timer,
   Ingredients,
   Img,
-  Food_Info
+  Food_Info,
+  User
 );
 
 /* Create WEB SERVER*/

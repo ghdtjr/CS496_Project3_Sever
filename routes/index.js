@@ -25,7 +25,8 @@ module.exports = function (
   Recipe_Timer,
   Ingredients,
   Img,
-  Food_Info
+  Food_Info,
+  User
 ) {
   app.get("/main/get_recipes", function (request, response) {
     console.log("/main/get_recipes");
@@ -357,4 +358,144 @@ module.exports = function (
       }
     });
   });
+
+  /* user apis */
+
+  /* Registration for the first user */
+  app.post('/user/register', function (request, response) {
+    console.log('/user/register');
+    /** Check the input is valid or not
+     * Invalid if there is same value in the database already */
+    User.countDocuments({ id: request.body.id }, function (err, cnt) {
+      if (cnt) {
+        response.json('ID already exists');
+        console.log('ID already exists');
+      } else {
+        /* Get request's string */
+        var user = new User();
+        var post_data = request.body;
+        user.id = post_data.id;
+        user.password = post_data.password;
+        user.first_name = post_data.first_name;
+        user.last_name = post_data.last_name;
+        user.email = post_data.email;
+        user.food_list = ' ';
+
+        user.save(function (err) {
+          if (err) {
+            console.err(err);
+            response.json("0");
+            return;
+          }
+          response.json("1");
+        });
+      }
+    });
+    return;
+  });
+
+  /* Check the new ID is valid or not*/
+  app.get('/user/register/:newID', function (request, response) {
+    console.log('/user/register/:newID');
+    console.log(request.params.newID);
+    User.countDocuments({ id: request.params.newID }, function (err, cnt) {
+      if (!cnt) {
+        /* newID valid */
+        return response.json("1");
+      }
+      /* newID is already exists */
+      return response.json("0");
+    });
+    return;
+  });
+
+  /* login for the application use */
+  app.post('/user/login', function (request, response) {
+    console.log('/user/login');
+
+    /** Check the input is valid or not
+     * Invalid if there is no corresponding document values
+     * in the database already */
+    User.countDocuments({ id: request.body.id }, function (err, cnt) {
+      if (!cnt) {
+        response.json('ID not exists');
+        console.log('ID not exists');
+        return;
+      } else {
+        /* Get request's string */
+        var post_data = request.body;
+        var id = post_data.id;
+        var password = post_data.password;
+        User.findOne({ id: id }, function (err, user) {
+          /* unknown error */
+          if (err) {
+            response.end();
+          } else if (password == user.password) {
+            response.json('1');
+            console.log('Login success');
+          } else {
+            response.json('0');
+            console.log('Wrong password');
+          }
+        });
+      }
+    });
+    return;
+  });
+
+  /* update the user food list  */
+  app.post('/user/like_food', function (request, response) {
+    console.log('/user/like_food');
+    var recipe_name = request.body.recipe_name;
+    var id = request.body.id;
+
+    User.findOne({ id: id }, function (err, user) {
+      if (err) {
+        return response.status(500).send({ error: "database failure" });
+      }
+      if (!user) {
+        return response.status(404).json({ error: "user not found" });
+      }
+      if (user.food_list.includes("recipe_name")) {
+        return response.json(recipe_name + ' is already in the list')
+      } else {
+        user.food_list = user.food_list + '@' + recipe_name;
+        user.save(function (err) {
+          if (err)
+            response.status(500).json({ error: "failed to update" });
+          response.json("1");
+        });
+      };
+    });
+  });
+
+  app.get('/user/get_like_food/:user_id', function (request, response) {
+    console.log('/user/get_like_food/:user_id');
+    var id = request.params.user_id;
+    User.findOne({ id: id }, function (err, user) {
+      if (err) {
+        return response.status(500).send({ error: "database failure" });
+      }
+      if (!user) {
+        return response.status(404).json({ error: "user not found" });
+      }
+      var food_list = user.food_list.split('@');
+      food_list.shift()
+      response.json(food_list)
+
+
+    });
+
+  });
+
+
+
+
+
+
+
+
+
+
+
 };
