@@ -34,7 +34,7 @@ app.use(
 //cors
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://143.248.229.69:3000", "http://143.248.229.69"],
     exposeHeaders: ["WWW-Authenticate", "Server-Authorization"],
     // maxAge: 5,
     // credentials: true,
